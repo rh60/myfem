@@ -23,13 +23,21 @@ double u1(double x)
     return sin(x);
 }
 
-void save(Mesh& mesh , GridFunction& x)
+void SaveVTK(Mesh& mesh , GridFunction& x)
 {
     ofstream ofs("solution.vtk");
     ofs.precision(8);
     const int ref = 1;
     mesh.PrintVTK(ofs, ref);
     x.SaveVTK(ofs, "u", ref);
+}
+
+void SaveVisit(Mesh& mesh, GridFunction& x)
+{
+    VisItDataCollection dc("solution", &mesh);
+    dc.SetPrecision(8);
+    dc.RegisterField("u", &x);
+    dc.Save();
 }
 
 void dim1()
@@ -47,7 +55,7 @@ void dim1()
         u_exact[i] = u1(x[i]);
     }
 
-    save(mesh, u_exact);    
+    SaveVTK(mesh, u_exact);    
 }
 
 void dim2()
@@ -106,7 +114,7 @@ void dim2()
     {
         err[i] = x[i] - u_exact[i];
     }
-    save(mesh, err);
+    SaveVisit(mesh, x);
 }
 
 int main()
